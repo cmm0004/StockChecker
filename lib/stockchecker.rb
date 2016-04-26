@@ -6,10 +6,16 @@ module StockChecker
 	class Application < Sinatra::Base
 
 
-    get '/stock/?' do
+    post '/stock/?' do
       results = {}
       message = {}
-      uri = URI('http://finance.yahoo.com/webservice/v1/symbols/'+ params['symbol']+'/quote?format=json')
+      params = JSON.parse(request.env["rack.input"].read, :symbolize_names => true)
+      puts params.inspect
+      incoming_message = params[:item][:message][:message].split(' ')
+      
+
+
+      uri = URI('http://finance.yahoo.com/webservice/v1/symbols/'+ incoming_message[-1] +'/quote?format=json')
       resp = Net::HTTP.get(uri)
       resp_hash = JSON.parse(resp, {:symbolize_names => true})
 

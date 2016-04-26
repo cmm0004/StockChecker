@@ -5,10 +5,6 @@ GEM
     diff-lcs (1.2.5)
     dotenv (2.1.1)
     eventmachine (1.2.0.1)
-    pdf-core (0.6.1)
-    prawn (2.1.0)
-      pdf-core (~> 0.6.1)
-      ttfunk (~> 1.4.0)
     rack (1.6.4)
     rack-protection (1.5.3)
       rack
@@ -34,14 +30,12 @@ GEM
       eventmachine (~> 1.0, >= 1.0.4)
       rack (~> 1.0)
     tilt (2.0.2)
-    ttfunk (1.4.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   dotenv
-  prawn
   rspec
   sinatra
   thin
