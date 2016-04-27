@@ -6,8 +6,7 @@ module StockChecker
 
 		post '/suggest/?' do
 			messages = []
-			params = JSON.parse(request.env["rack.input"].read, :symbolize_names => true)
-
+			
 			uri = URI('https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=&company=&dateb=&owner=only&start=0&count=100&output=atom')
       		resp = Net::HTTP.get(uri)
 
