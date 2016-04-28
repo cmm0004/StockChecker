@@ -13,7 +13,7 @@ module StockChecker
       		xml_hash = XmlSimple.xml_in(resp, {'KeyAttr' => 'name'})
 
 
-      		xml_hash['entry'][0..6].each do |entry|
+      		xml_hash['entry'][0..9].each do |entry|
       			next unless entry['title'][0] =~ /Reporting/
 
       			link = entry['link'][0]['href']
@@ -39,16 +39,21 @@ module StockChecker
 				#now in the doc we want
 				
 				final_xml_hash = XmlSimple.xml_in(new_resp_xml, {'KeyAttr' => 'name'})
-				#puts final_xml_hash['nonDerivativeTable'][0]['nonDerivativeTransaction'][0]['transactionAmounts'][0]['transactionAcquiredDisposedCode'][0]['value'][0] 
-				stocksymbol = final_xml_hash['issuer'][0]['issuerTradingSymbol']
-				#AorD = final_xml_hash['transactionAcquiredDisposedCode'][0]['value']
-				transaction = final_xml_hash['nonDerivativeTable'][0]['nonDerivativeTransaction'][0]['transactionAmounts'][0]['transactionAcquiredDisposedCode'][0]['value'][0] == 'A' ? 'acquired' : 'sold'
-      			# lastbit = link.split('/')[-1]
-      			# new_link = link.sub(lastbit, 'form4.xml')
+				
+				ownerstring = determine_owner(final_xml_hash['reportingOwner'][0]['reportingOwnerRelationship'][0])
+				
+				stocksymbol = final_xml_hash['issuer'][0]['issuerTradingSymbol'][0]
+			
+				
+				shares = final_xml_hash['nonDerivativeTable'][0]['nonDerivativeTransaction'][0]['transactionAmounts'][0]['transactionShares'][0]['value'][0]
+
+				price_per_share = final_xml_hash['nonDerivativeTable'][0]['nonDerivativeTransaction'][0]['transactionAmounts'][0]['transactionPricePerShare'][0]['value'][0]
+				
+				type_of_purchase = determine_transaction_type(final_xml_hash['nonDerivativeTable'][0]['nonDerivativeTransaction'][0]['transactionAmounts'][0]['transactionAcquiredDisposedCode'][0]['value'][0])
+
       			amount = final_xml_hash['nonDerivativeTable'][0]['nonDerivativeTransaction'][0]['transactionAmounts'][0]['transactionShares'][0]['value'][0]
-      			# puts "\n\n\n#{new_link}"
-      			#puts final_xml_hash
-      			messages << "A form4 filer just #{transaction} $#{amount} worth of #{stocksymbol}"
+      		
+      			messages << "A #{ownerstring} just #{type_of_purchase} #{shares} shares of #{stocksymbol} at #{price_per_share} per share."
   			
       		end
 
@@ -61,5 +66,80 @@ module StockChecker
       		
       		message.to_json
 		end
+
+		def determine_owner(relationship_hash)
+			isDirector = nil
+			isOfficer = nil
+			isTenPercentOwner = nil
+			isOther = nil
+			title = nil
+			if !relationship_hash['isDirector'].nil?
+				case relationship_hash['isDirector'][0]
+					when (String and '1')
+						isDirector = 'Director,'
+					when (Integer and 1)
+						isDirector = 'Director,'
+					
+					when (String and ('true' or 'True' or 'TRUE'))
+						isDirector = 'Director,'
+					end
+			end
+
+			if !relationship_hash['isOfficer'].nil?
+				case relationship_hash['isOfficer'][0]
+					when (String and '1')
+						isDirector = 'Officer,'
+					when (Integer and 1)
+						isDirector = 'Officer,'
+					
+					when (String and ('true' or 'True' or 'TRUE'))
+						isDirector = 'Officer,'
+					end
+			end
+			if !relationship_hash['isTenPercentOwner'].nil?
+				case relationship_hash['isTenPercentOwner'][0]
+					when (String and '1')
+						isDirector = 'TenPercentOwner,'
+					when (Integer and 1)
+						isDirector = 'TenPercentOwner,'
+					
+					when (String and ('true' or 'True' or 'TRUE'))
+						isDirector = 'TenPercentOwner,'
+					end
+			end
+
+			if !relationship_hash['isOther'].nil?
+				case relationship_hash['isOther'][0]
+					when (String and '1')
+						isDirector = 'Other,'
+					when (Integer and 1)
+						isDirector = 'Other,'
+					
+					when (String and ('true' or 'True' or 'TRUE'))
+						isDirector = 'Other,'
+					end
+			end
+
+			if !relationship_hash['title'].nil?
+				title = !relationship_hash['officerTitle'][0].nil? ? relationship_hash['officerTitle'][0] : ''
+			end
+
+
+			return "#{isDirector} #{isOfficer} #{isTenPercentOwner} #{isOther} #{title}"
+
+		end
+
+		def determine_transaction_type(transaction_type)
+			case transaction_type
+				when 'A'
+					'aquired'
+				when 'D'
+					'disposed of'		
+				else
+					'moved'
+			end
+		end
+
+
 	end
 end
