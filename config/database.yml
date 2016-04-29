@@ -1,0 +1,31 @@
+development:
+  adapter: postgresql
+  database: <%= ENV['PG_DBNAME'] %>
+  username: <%= ENV['PG_USERNAME'] %>
+  password: <%= ENV['PG_PASSWORD'] %>
+  host: <%= ENV['PG_HOSTNAME'] %>
+  encoding: utf8
+  
+test:
+  adapter: postgresql
+  database: <%= ENV['PG_DBNAME'] %>
+  username: <%= ENV['PG_USERNAME'] %>
+  password: <%= ENV['PG_PASSWORD'] %>
+  host: <%= ENV['PG_HOSTNAME'] %>
+  encoding: utf8
+  
+staging:
+  adapter: postgresql
+  database: <%= ENV['PG_DBNAME'] %>
+  username: <%= ENV['PG_USERNAME'] %>
+  password: <%= ENV['PG_PASSWORD'] %>
+  host: <%= ENV['PG_HOSTNAME'] %>
+  encoding: utf8
+
+production:
+  adapter: postgresql
+  database: <%= ENV['PG_DBNAME'] %>
+  username: <%= ENV['PG_USERNAME'] %>
+  password: <%= ENV['PG_PASSWORD'] %>
+  host: <%= ENV['PG_HOSTNAME'] %>
+  encoding: utf8

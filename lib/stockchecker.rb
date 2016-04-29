@@ -1,7 +1,10 @@
 require 'sinatra'
 require 'json'
 require 'net/http'
+require './config/environments'
 require './lib/endpoints/suggest_stock'
+require './lib/endpoints/portfolio_tracking'
+
 
 module StockChecker
 	class Application < Sinatra::Base
@@ -11,7 +14,6 @@ module StockChecker
       results = {}
       message = {}
       params = JSON.parse(request.env["rack.input"].read, :symbolize_names => true)
-      puts params.inspect
       incoming_message = params[:item][:message][:message].split(' ')
       
 
