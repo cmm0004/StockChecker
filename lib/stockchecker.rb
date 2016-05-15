@@ -2,6 +2,7 @@ require 'sinatra'
 require 'json'
 require 'net/http'
 require './lib/endpoints/suggest_stock'
+require './lib/endpoints/jobluv'
 
 module StockChecker
 	class Application < Sinatra::Base
