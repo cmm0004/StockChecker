@@ -1,5 +1,5 @@
 module StockChecker
-	class Helpers
+	module Helpers
 		
 
 		# def type_of_buyer(xml_hash)
