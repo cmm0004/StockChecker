@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'json'
 require 'net/http'
+require './config/environments'
 require './lib/endpoints/suggest_stock'
 require './lib/endpoints/jobluv'
 
