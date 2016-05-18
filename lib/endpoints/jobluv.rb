@@ -36,7 +36,7 @@ module StockChecker
 
 					return {
 						color: "green",
-						message: "@#{mentioned_user} #{get_plus_jobluv_links().sample}",
+						message: "@#{user.hipchat_username} #{get_plus_jobluv_links().sample}",
 						notify: false,
 						message_format: "text"
 					}.to_json
@@ -55,7 +55,7 @@ module StockChecker
 
 					return {
 						color: "red",
-						message: "#@{mentioned_user} #{get_minus_jobluv_links().sample}",
+						message: "@#{user.hipchat_username} #{get_minus_jobluv_links().sample}",
 						notify: false,
 						message_format: "text"
 					}.to_json
@@ -63,7 +63,7 @@ module StockChecker
 					keys = '(key)' * user.jobluv_amount
 					return {
 							color: "green",
-							message: "#@{user.hipchat_username} is major #{keys}",
+							message: "@#{user.hipchat_username} is major #{keys}",
 							notify: false,
 							message_format: "text"
 						}.to_json
