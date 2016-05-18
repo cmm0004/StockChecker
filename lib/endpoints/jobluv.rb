@@ -1,7 +1,9 @@
+require './lib/models/jobluv'
+
 module StockChecker
 	class Application < Sinatra::Base
-	
-		
+		include Models
+
 		post '/jobluv/?' do
 			params = JSON.parse(request.env["rack.input"].read, :symbolize_names => true)
 			incoming_message = params[:item][:message][:message].split(' ')
@@ -10,27 +12,86 @@ module StockChecker
 			#possible usages 
 			#/Jobluv <user> <++>
 			#/Jobluv <user> <-->
+			return {    color: "red",
+						message: "You kno I 'preciate tha luv, but ya gotta tell me who",
+						notify: false,
+						message_format: "text"
+					}.to_json unless !mentioned_user.blank?
 
-			if action == '++'
-				return {
+			user = StockChecker::Models::Jobluv.find_by(:hipchat_username => mentioned_user)
+			 
+
+			if !user.nil? 
+				if action == '++'
+					begin
+						user.update!(:jobluv_amount => (user.jobluv_amount += 1) )
+					rescue => e
+						return {
+							color: "red",
+							message: "Exception raised: #{e} for request: #{params}",
+							notify: false,
+							message_format: "text"
+						}.to_json
+					end
+
+					return {
 						color: "green",
 						message: "#{mentioned_user} #{get_plus_jobluv_links().sample}",
 						notify: false,
 						message_format: "text"
 					}.to_json
-			elsif action == '--'
-				return {
+
+				elsif action == '--'
+					begin
+						user.update!(:jobluv_amount => (user.jobluv_amount -= 1) )
+					rescue => e
+						return {
+							color: "red",
+							message: "Exception raised: #{e} for request: #{params}",
+							notify: false,
+							message_format: "text"
+						}.to_json
+					end
+
+					return {
 						color: "red",
 						message: "#{mentioned_user} #{get_minus_jobluv_links().sample}",
 						notify: false,
 						message_format: "text"
 					}.to_json
+				elsif action == '?'
+					keys = '(key)' * user.jobluv_amount
+					return {
+							color: "green",
+							message: "#{user.hipchat_username} is major #{keys}",
+							notify: false,
+							message_format: "text"
+						}.to_json
+				end
+			else 
+				begin
+					StockChecker::Models::Jobluv.create!(
+						:hipchat_username => mentioned_user,
+						:jobluv_amount => 0,
+						:is_the_job_don => false)
+				rescue => e
+					return {
+						color: "red",
+						message: "Exception raised: #{e} for request: #{params}",
+						notify: false,
+						message_format: "text"
+					}.to_json
+				end
+
+				return {
+						color: "green",
+						message: "You are now on the road to success #{mentioned_user} , ride wit me.",
+						notify: false,
+						message_format: "text"
+					}.to_json
 			end
-
-			status 403
 		end
-
-		
+	   
 
 		def get_plus_jobluv_links
 				links = [
