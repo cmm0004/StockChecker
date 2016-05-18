@@ -12,7 +12,7 @@ subtracts a key
 
 displays current key count
 
-### /stock <SYMB>
+### /stock \<SYMB\>
 
 gives back the current price of that stock
 
